@@ -7,6 +7,7 @@ import { ExtensionHelper } from '../../helpers/extensionHelper';
 import { KbTreeBaseItem } from './kbTreeBaseItem';
 import { fstat } from 'fs';
 import { RuleBaseItem } from './ruleBaseItem';
+import { Configuration } from '../config/configuration';
 
 export enum ContentFolderType {
 	ContentRoot = 1,
@@ -51,13 +52,13 @@ export class ContentFolder extends RuleBaseItem {
 
 		if(type == ContentFolderType.PackageFolder || type == ContentFolderType.ContentRoot) {
 			this.iconPath = {
-				light: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'light', 'package.svg'),
-				dark: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'dark', 'package.svg')
+				light: path.join(Configuration.get().getExtentionPath(), 'resources', 'light', 'package.svg'),
+				dark: path.join(Configuration.get().getExtentionPath(), 'resources', 'dark', 'package.svg')
 			};
 		} else {
 			this.iconPath = {
-				light: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'light', 'folder.svg'),
-				dark: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'dark', 'folder.svg')
+				light: path.join(Configuration.get().getExtentionPath(), 'resources', 'light', 'folder.svg'),
+				dark: path.join(Configuration.get().getExtentionPath(), 'resources', 'dark', 'folder.svg')
 			};
 		}
 

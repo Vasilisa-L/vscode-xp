@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 
+import { Configuration } from '../../models/config/configuration';
 import { CorrelationUnitTest } from '../../models/tests/correlationUnitTest';
-import { Configuration } from '../../models/configuration';
 
 export class ModularTestContentEditorViewProvider  {
 

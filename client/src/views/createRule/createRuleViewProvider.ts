@@ -7,7 +7,7 @@ import { MustacheFormatter } from '../mustacheFormatter';
 import { ExtensionHelper } from '../../helpers/extensionHelper';
 import { ContentTreeProvider } from '../contentTree/contentTreeProvider';
 import { RuleBaseItem } from '../../models/content/ruleBaseItem';
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 import { FileSystemHelper } from '../../helpers/fileSystemHelper';
 import { ContentHelper } from '../../helpers/contentHelper';
 
@@ -27,7 +27,7 @@ export class CreateRuleViewProvider {
 
         // Форма создания корреляции.
         const createCorrelationTemplateFilePath = path.join(
-            ExtensionHelper.getExtentionPath(), "client", "templates", "CreateRule.html");
+            Configuration.get().getExtentionPath(), "client", "templates", "CreateRule.html");
         const reateCorrelationTemplateContent = await FileSystemHelper.readContentFile(createCorrelationTemplateFilePath);
 
         const createCorrelationViewProvider = new CreateRuleViewProvider(

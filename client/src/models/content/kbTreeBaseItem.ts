@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { Configuration } from '../config/configuration';
 
 /**
  * Базовый класс для всех item-ом из дерева контента.
@@ -19,7 +20,7 @@ export abstract class KbTreeBaseItem extends vscode.TreeItem {
 	/**
 	 * Переименовывает item.
 	 */
-	public async rename(newName: string) : Promise<void> {}
+	public async rename(newRuleName: string): Promise<void> {}
 
 	/**
 	 * Задает имя метки, которая отображается в дереве.

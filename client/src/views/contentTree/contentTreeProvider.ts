@@ -14,7 +14,7 @@ import { Macros } from '../../models/content/macros';
 import { RuleBaseItem } from '../../models/content/ruleBaseItem';
 import { VsCodeApiHelper } from '../../helpers/vsCodeApiHelper';
 import { API, APIState } from '../../@types/vscode.git';
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 import { OpenKnowledgebaseCommand } from './commands/openKnowledgebaseCommand';
 import { ModularTestsListViewProvider } from '../modularTestsEditor/modularTestsListViewProvider';
 import { CreateRuleViewProvider } from '../createRule/createRuleViewProvider';
@@ -27,7 +27,6 @@ import { BuildAllGraphsAction } from './actions/buildAllGraphsAction';
 import { PackKbPackageAction } from './actions/packKbPackageAction';
 import { UnpackKbPackageAction } from './actions/unpackKbPackageAction';
 import { ContentType } from '../../contentType/contentType';
-import { ContentTypeChecker } from '../../contentType/contentTypeChecker';
 import { SetContentTypeCommand } from '../../contentType/setContentTypeCommand';
 import { GitHooks } from './gitHooks';
 import { InitKBRootCommand } from './commands/InitKBRootCommand';
@@ -177,8 +176,7 @@ export class ContentTreeProvider implements vscode.TreeDataProvider<ContentFolde
 				ContentTreeProvider.unpackKbPackageCommand,
 				async (selectedItem: RuleBaseItem) => {
 	
-					const pathHelper = Configuration.get().getPathHelper();
-					if(!pathHelper.isKbOpened()) {
+					if(!config.isKbOpened()) {
 						ExtensionHelper.showUserInfo("Нельзя собрать схемы ТС и графы без открытия базы знаний. Сначала откройте базу знаний.");
 						return;
 					}
@@ -205,13 +203,11 @@ export class ContentTreeProvider implements vscode.TreeDataProvider<ContentFolde
 			vscode.commands.registerCommand(
 				ContentTreeProvider.buildKbPackageCommand,
 				async (selectedItem: RuleBaseItem) => {
-					const pathHelper = Configuration.get().getPathHelper();
-					if(!pathHelper.isKbOpened()) {
+					if(!config.isKbOpened()) {
 						ExtensionHelper.showUserInfo("Нельзя собрать схемы ТС и графы без открытия базы знаний. Сначала откройте базу знаний.");
 						return;
 					}
 					
-					const config = Configuration.get();
 					const bag = new PackKbPackageAction(config);
 					await bag.run(selectedItem);
 				}
@@ -306,54 +302,53 @@ export class ContentTreeProvider implements vscode.TreeDataProvider<ContentFolde
 	}
 
 	private isContentRoot(dirName: string) {
-		const pathHelper = Configuration.get().getPathHelper();
-		const rootFolders = pathHelper.getContentRoots().map(dir => {return path.basename(dir);});
+		const rootFolders = this._config.getContentRoots().map(dir => {return path.basename(dir);});
 		return rootFolders.includes(dirName);
 	}
 
 	private async initializeRootIfNeeded(subDirectories: string[]) : Promise<void> {
 		// Проверяем тип контента фактический и выбранный и увеломляем если что-то не так.
-		const actualContentType = ContentTypeChecker.getContentTypeBySubDirectories(subDirectories);
-		const configContentType = this._config.getContentType();
+		// const actualContentType = ContentTypeChecker.getContentTypeBySubDirectories(subDirectories);
+		// const configContentType = this._config.getContentType();
 		
-		if(!actualContentType){
-			const answer = await vscode.window.showInformationMessage(
-				`Кажется, что база знаний не проинициализирована, хотите создать необходимые директории для режима ${configContentType} автоматически?`,
-				"Да",
-				"Нет");
+		// if(!actualContentType){
+		// 	const answer = await vscode.window.showInformationMessage(
+		// 		`Кажется, что база знаний не проинициализирована, хотите создать необходимые директории для режима ${configContentType} автоматически?`,
+		// 		"Да",
+		// 		"Нет");
 
-			if (answer === "Да") {		
-				return vscode.commands.executeCommand(InitKBRootCommand.Name, this._config, this._knowledgebaseDirectoryPath);
-			}
-		}
+		// 	if (answer === "Да") {		
+		// 		return vscode.commands.executeCommand(InitKBRootCommand.Name, this._config, this._knowledgebaseDirectoryPath);
+		// 	}
+		// }
 	}
 
 	private async notifyIfContentTypeIsSelectedIncorrectly(subDirectories: string[]) : Promise<void> {
 		// Проверяем тип контента фактический и выбранный и увеломляем если что-то не так.
-		const actualContentType = ContentTypeChecker.getContentTypeBySubDirectories(subDirectories);
-		const configContentType = this._config.getContentType();
+		// const actualContentType = ContentTypeChecker.getContentTypeBySubDirectories(subDirectories);
+		// const configContentType = this._config.getContentType();
 
-		if(actualContentType == ContentType.EDR && configContentType == ContentType.SIEM) {
-			const answer = await vscode.window.showInformationMessage(
-				"Кажется, что база знаний в формате EDR, хотите изменить тип контента? Неправильная настройка не позволит собрать пакет.",
-				"Да",
-				"Нет");
+		// if(actualContentType == ContentType.EDR && configContentType == ContentType.SIEM) {
+		// 	const answer = await vscode.window.showInformationMessage(
+		// 		"Кажется, что база знаний в формате EDR, хотите изменить тип контента? Неправильная настройка не позволит собрать пакет.",
+		// 		"Да",
+		// 		"Нет");
 
-			if (answer === "Да") {
-				return vscode.commands.executeCommand(SetContentTypeCommand.Name, ContentType.EDR);
-			}
-		}
+		// 	if (answer === "Да") {
+		// 		return vscode.commands.executeCommand(SetContentTypeCommand.Name, ContentType.EDR);
+		// 	}
+		// }
 
-		if(actualContentType == ContentType.SIEM && configContentType == ContentType.EDR) {
-			const answer = await vscode.window.showInformationMessage(
-				"Кажется, что база знаний в формате SIEM, хотите изменить тип контента? Неправильная настройка не позволит собрать пакет.",
-				"Да",
-				"Нет");
+		// if(actualContentType == ContentType.SIEM && configContentType == ContentType.EDR) {
+		// 	const answer = await vscode.window.showInformationMessage(
+		// 		"Кажется, что база знаний в формате SIEM, хотите изменить тип контента? Неправильная настройка не позволит собрать пакет.",
+		// 		"Да",
+		// 		"Нет");
 
-			if (answer === "Да") {
-				return vscode.commands.executeCommand(SetContentTypeCommand.Name, ContentType.SIEM);
-			}
-		}
+		// 	if (answer === "Да") {
+		// 		return vscode.commands.executeCommand(SetContentTypeCommand.Name, ContentType.SIEM);
+		// 	}
+		// }
 	}
 
 	private highlightsLabelForNewOrEditRules(items: RuleBaseItem[]) : void {

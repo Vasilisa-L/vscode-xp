@@ -4,7 +4,7 @@ import * as path from 'path';
 import { CorrelationUnitTest } from '../../models/tests/correlationUnitTest';
 import { UnitTestsRunner } from '../../models/tests/unitTestsRunner';
 import { ExtensionHelper } from '../../helpers/extensionHelper';
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 import { RuleBaseItem } from '../../models/content/ruleBaseItem';
 import { VsCodeApiHelper } from '../../helpers/vsCodeApiHelper';
 import { ContentTreeProvider } from '../contentTree/contentTreeProvider';

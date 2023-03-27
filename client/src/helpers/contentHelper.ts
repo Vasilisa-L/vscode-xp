@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
 import * as path from 'path';
-import { Configuration } from '../models/configuration';
+import { Configuration } from '../models/config/configuration';
 import { Correlation } from '../models/content/correlation';
 
 import { Enrichment } from '../models/content/enrichment';

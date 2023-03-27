@@ -9,7 +9,7 @@ import { IntegrationTest } from '../tests/integrationTest';
 import { KbTreeBaseItem } from './kbTreeBaseItem';
 import { FileSystemError } from 'vscode';
 import { FileSystemHelper } from '../../helpers/fileSystemHelper';
-import { Configuration } from '../configuration';
+import { Configuration } from '../config/configuration';
 import { YamlHelper } from '../../helpers/yamlHelper';
 import { ContentHelper } from '../../helpers/contentHelper';
 import { ArgumentException } from '../argumentException';
@@ -56,8 +56,7 @@ export abstract class RuleBaseItem extends KbTreeBaseItem {
 		}
 
 		const pathEntities = this.getDirectoryPath().split(path.sep);
-		const kbPaths = config.getPathHelper();
-		const roots = kbPaths.getContentRoots().map(folder => {return path.basename(folder);});
+		const roots = config.getContentRoots().map(folder => {return path.basename(folder);});
 		for (const root of roots){
 			const  packagesDirectoryIndex = pathEntities.findIndex( pe => pe.toLocaleLowerCase() === root);
 			if(packagesDirectoryIndex === -1){
@@ -80,8 +79,7 @@ export abstract class RuleBaseItem extends KbTreeBaseItem {
 		}
 
 		const pathEntities = this.getDirectoryPath().split(path.sep);
-		const kbPaths = config.getPathHelper();
-		const roots = kbPaths.getContentRoots().map(folder => {return path.basename(folder);});
+		const roots = config.getContentRoots().map(folder => {return path.basename(folder);});
 		for (const root of roots){
 			const  packagesDirectoryIndex = pathEntities.findIndex( pe => pe.toLocaleLowerCase() === root);
 			if(packagesDirectoryIndex === -1){

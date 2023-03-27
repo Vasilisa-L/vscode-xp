@@ -8,7 +8,7 @@ import { SiemjConfigHelper } from '../siemj/siemjConfigHelper';
 import { TestHelper } from '../../helpers/testHelper';
 import { VsCodeApiHelper } from '../../helpers/vsCodeApiHelper';
 import { SiemJOutputParser } from '../../views/integrationTests/siemJOutputParser';
-import { Configuration } from '../configuration';
+import { Configuration } from '../config/configuration';
 import { RuleBaseItem } from '../content/ruleBaseItem';
 import { IntegrationTest } from './integrationTest';
 import { TestStatus } from './testStatus';
@@ -46,8 +46,7 @@ export class IntegrationTestRunner {
 
 		await SiemjConfigHelper.clearArtifacts(this._config);
 
-		const outputDirname = this._config.getPathHelper().getOutputDirName();
-		const outputDirPath = path.join(this._config.getOutputDirectoryPath(), outputDirname);
+		const outputDirPath = this._config.getOutputDirectoryPath();
 		if(!fs.existsSync(outputDirPath)) {
 			await fs.promises.mkdir(outputDirPath);
 		}

@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-import { Configuration } from '../configuration';
+import { Configuration } from '../config/configuration';
 
 
 /**
@@ -15,9 +15,7 @@ export class SiemjConfBuilder {
 		const taxonomy = this._config.getTaxonomyFullPath();
 		const temp = this._config.getTmpDirectoryPath();
 
-		const pathHelper = this._config.getPathHelper();
-		const outputDirName = pathHelper.getOutputDirName();
-		const outputFolder = this._config.getOutputDirectoryPath(outputDirName);
+		const outputFolder = this._config.getOutputDirectoryPath();
 
 		// Заполнение конфига по умолчанию.
 		this._siemjConfigSection = 
@@ -34,9 +32,8 @@ temp=${temp}`;
 	 * @param force пересобирать ли ранее собранный	граф
 	 */
 	public addNfgraphBuilding(force : boolean = true) : void {
-		const pathLocator = this._config.getPathHelper();
-		const xpAppendixPath = pathLocator.getAppendixPath();
-		const contentRoots = pathLocator.getContentRoots();
+		const xpAppendixPath = this._config.getAppendixPath();
+		const contentRoots = this._config.getContentRoots();
 
 		// Не собираем граф, если он уже есть.
 		if(!force) {
@@ -63,9 +60,8 @@ out=\${output_folder}\\formulas_graph.json`;
 	}
 
 	public addTablesSchemaBuilding() : void {
-		const pathLocator = this._config.getPathHelper();
-		const contentRoots = pathLocator.getContentRoots();
-		const contract = pathLocator.getTablesContract();
+		const contentRoots = this._config.getContentRoots();
+		const contract = this._config.getTablesContract();
 
 		// Собираем граф нормализации из всех источников контента, их несколько для EDR.
 		const rulesSrcPath = contentRoots.join(",");
@@ -103,9 +99,8 @@ out=\${output_folder}\\fpta_db.db`;
 	 * @returns 
 	 */
 	public addCfgraphBuilding(force : boolean = true, contentSubdirPath? : string) : void {
-		const pathLocator = this._config.getPathHelper();
-		const rulesFilters = pathLocator.getRulesDirFilters();
-		const contentRoots = pathLocator.getContentRoots();
+		const rulesFilters = this._config.getRulesDirFilters();
+		const contentRoots = this._config.getContentRoots();
 
 		// Не собираем граф, если он уже есть.
 		if(!force) {
@@ -139,9 +134,8 @@ out=\${output_folder}\\corrules_graph.json`;
 	}
 
 	public addEfgraphBuilding(force : boolean = true) : void {
-		const pathLocator = this._config.getPathHelper();
-		const rulesFilters = pathLocator.getRulesDirFilters();
-		const contentRoots = pathLocator.getContentRoots();
+		const rulesFilters = this._config.getRulesDirFilters();
+		const contentRoots = this._config.getContentRoots();
 
 		// Не собираем граф, если он уже есть.
 		if(!force) {

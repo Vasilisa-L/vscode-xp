@@ -7,7 +7,7 @@ import { ProcessHelper } from '../../helpers/processHelper';
 import { TestHelper } from '../../helpers/testHelper';
 import { CorrelationUnitTest } from './correlationUnitTest';
 import { ExtensionHelper } from '../../helpers/extensionHelper';
-import { Configuration } from '../configuration';
+import { Configuration } from '../config/configuration';
 import { TestStatus } from './testStatus';
 import { ModuleTestOutputParser } from '../../views/modularTestsEditor/modularTestOutputParser';
 import { ContentTreeProvider } from '../../views/contentTree/contentTreeProvider';
@@ -23,9 +23,10 @@ export class UnitTestsRunner {
 	public async run(test: CorrelationUnitTest): Promise<CorrelationUnitTest> {
 
 		// const tmp = `--temp "c:\\Work\\-=SIEM=-\\Output\\temp"`;
-		const root = this._config.getPathHelper().getRootByPath(test.getRule().getDirectoryPath());
+		const root = this._config.getRootByPath(test.getRule().getDirectoryPath());
 		const rootFolder = path.basename(root);
-		const outputFolder = this._config.getOutputDirectoryPath(rootFolder);
+
+		const outputFolder = this._config.getOutputDirectoryPath();
 		if(!fs.existsSync(outputFolder)) {
 			fs.mkdirSync(outputFolder);
 		}
@@ -36,8 +37,7 @@ export class UnitTestsRunner {
 			fs.mkdirSync(tmpDirPath);
 		}
 
-		const pathHelper = Configuration.get().getPathHelper();
-		if(!pathHelper.isKbOpened()) {
+		if(!this._config.isKbOpened()) {
 			ExtensionHelper.showUserError("Не открыта база знаний");
 			return;
 		}
@@ -63,9 +63,9 @@ export class UnitTestsRunner {
 			const sdkDirPath = this._config.getSiemSdkDirectoryPath();
 			const taxonomyFilePath= this._config.getTaxonomyFullPath();
 			const testFilepath = test.getTestPath();
-			const fptDefaults = this._config.getCorrelationDefaultsFilePath(rootFolder);
-			const schemaFilePath = this._config.getSchemaFullPath(rootFolder);
-			const ruleFiltersDirPath = pathHelper.getRulesDirFilters();
+			const fptDefaults = this._config.getCorrelationDefaultsFilePath();
+			const schemaFilePath = this._config.getSchemaFullPath();
+			const ruleFiltersDirPath = this._config.getRulesDirFilters();
 
 			const output = await ProcessHelper.ExecuteWithArgsWithRealtimeOutput(ecaTestParam,
 				[

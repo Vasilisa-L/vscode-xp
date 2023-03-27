@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { workspace, ExtensionContext } from 'vscode';
 
@@ -16,7 +17,7 @@ import { ModularTestContentEditorViewProvider } from './views/modularTestsEditor
 import { ModularTestsListViewProvider } from './views/modularTestsEditor/modularTestsListViewProvider';
 import { IntegrationTestEditorViewProvider } from './views/integrationTests/integrationTestEditorViewProvider';
 import { MetainfoViewProvider } from './views/metaInfo/metainfoViewProvider';
-import { Configuration } from './models/configuration';
+import { Configuration } from './models/config/configuration';
 import { XpCompletionItemProvider } from './providers/xpCompletionItemProvider';
 import { ContentTreeProvider } from './views/contentTree/contentTreeProvider';
 import { RunningCorrelationGraphProvider } from './views/сorrelationGraph/runningCorrelationGraphProvider';
@@ -26,14 +27,19 @@ import { TestsFormatContentMenuExtention } from './ext/contextMenuExtention';
 import { SetContentTypeCommand } from './contentType/setContentTypeCommand';
 import { YamlHelper } from './helpers/yamlHelper';
 import { InitKBRootCommand } from './views/contentTree/commands/InitKBRootCommand';
-
+import { ContentType } from './contentType/contentType';
+import { EDRConfiguration } from './models/config/EDRConfiguration';
+import { SIEMConfiguration } from './models/config/SIEMConfiguration';
+import { XpException } from './models/xpException';
+import { FileSystemHelper } from './helpers/fileSystemHelper';
 
 let client: LanguageClient;
+export let config : Configuration;
 
 export async function activate(context: ExtensionContext) {
 
 	// Инициализация реестр глобальных параметров.
-	const config = await Configuration.init(context);
+	config = await init(context, ContentType.SIEM);
 
 	// Конфигурирование LSP.
 	const serverModule = context.asAbsolutePath(
@@ -186,3 +192,45 @@ export async function deactivate(): Promise<void> | undefined {
 
 	return client.stop();
 }
+
+async function init(context : vscode.ExtensionContext, contentType : ContentType) : Promise<Configuration> {
+	switch(contentType) {
+		case ContentType.SIEM: {
+			config = new SIEMConfiguration(context);
+			break;
+		}
+
+		case ContentType.EDR: {
+			config = new EDRConfiguration(context);
+			break;
+		}
+
+		default: {
+			throw new XpException("Заданный тип контента не поддерживается.");
+		}
+	}
+
+	let outputDirPath : string;
+	try {
+		outputDirPath = config.getOutputDirectoryPath();
+		if(!fs.existsSync(outputDirPath)) {
+			return config;
+		}
+		await FileSystemHelper.clearDirectory(outputDirPath);
+	}
+	catch(error) {
+		console.warn(`Не удалось удалить временную директорию '${outputDirPath}'`);
+	}
+
+	return config;
+}
+
+
+
+
+
+
+
+
+
+

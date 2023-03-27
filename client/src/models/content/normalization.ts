@@ -5,6 +5,7 @@ import { MetaInfo } from '../metaInfo/metaInfo';
 import { Localization } from './localization';
 import { ExtensionHelper } from '../../helpers/extensionHelper';
 import { ContentTreeProvider } from '../../views/contentTree/contentTreeProvider';
+import { Configuration } from '../config/configuration';
 
 
 export class Normalization extends RuleBaseItem {
@@ -66,8 +67,8 @@ export class Normalization extends RuleBaseItem {
 	}
  
 	iconPath = {
-		light: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'light', 'rule.svg'),
-		dark: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'dark', 'rule.svg')
+		light: path.join(Configuration.get().getExtentionPath(), 'resources', 'light', 'rule.svg'),
+		dark: path.join(Configuration.get().getExtentionPath(), 'resources', 'dark', 'rule.svg')
 	};
 
 	contextValue = 'Normalization';

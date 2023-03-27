@@ -5,7 +5,7 @@ import * as path from 'path';
 import { ExtensionHelper } from '../../helpers/extensionHelper';
 import { MustacheFormatter } from '../mustacheFormatter';
 import { RuleBaseItem } from '../../models/content/ruleBaseItem';
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 
 export class TableListsEditorViewProvider  {
 
@@ -21,7 +21,7 @@ export class TableListsEditorViewProvider  {
 	public static init(context: Configuration) {
 
 		const templateFilePath = path.join(
-			ExtensionHelper.getExtentionPath(), "client", "templates", "TableListEditor.html");
+			Configuration.get().getExtentionPath(), "client", "templates", "TableListEditor.html");
 
 		const provider = new TableListsEditorViewProvider(templateFilePath);
 	

@@ -2,33 +2,21 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { PathLocator } from './pathLocator';
+import { Configuration } from './configuration'
 import { XpException } from '../xpException';
 
-
-export class EDRPathHelper extends PathLocator {
-
-	private constructor(kbFullPath: string) {
-		super(kbFullPath);
-	}
+export class EDRConfiguration extends Configuration {
 	
-	private _prefix = path.join("resources", "build-resources");
-	private static _instance: EDRPathHelper;
-
-	public static get() : EDRPathHelper {
-		const kbFullPath =
-		(vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
-			? vscode.workspace.workspaceFolders[0].uri.fsPath
-			: undefined;
-
-		if (!EDRPathHelper._instance){
-			EDRPathHelper._instance = new EDRPathHelper(kbFullPath);
-		}
-		return EDRPathHelper._instance;
+	public getOutputDirectoryPath(): string {
+		throw new Error('Method not implemented.');
 	}
 
-	public getOutputDirName(): string {
-		throw new XpException("Данная функция не поддерживается.");
+	constructor(context : vscode.ExtensionContext) {
+		super(context);
+	}
+
+	public getOutputSpecificSubDirName(): string {
+		throw new XpException('Method not implemented.');
 	}
 
 	public getRootByPath(directory: string): string{
@@ -52,15 +40,17 @@ export class EDRPathHelper extends PathLocator {
 		throw new Error(`Путь '${directory}' не содержит ни одну из корневых директорий: [${roots.join(", ")}].`);
 	}
 	
-	public getCorrulesGraphFileName() : string {
-		return "rules_graph.json";
+	public getCorrulesGraphFilePath() : string {
+		return path.join(
+			this.getOutputDirectoryPath(),
+			"rules_graph.json");
 	}
+
 
 	// В корневой директории лежат пакеты экспертизы
 	public getContentRoots() : string[] {
 
 		this.checkKbPath();
-
 		const basePath = path.join(this.getKbFullPath(), "rules");
 
 		let rootDirectories = [];
@@ -84,8 +74,12 @@ export class EDRPathHelper extends PathLocator {
 		return packagesDirectories;
 	}
 
-	public getRequiredRootDirectories(): string[]{
-		return [path.join("common", "rules_filters"), path.join('rules', "windows"), path.join('rules', "linux")];
+	public getRequiredRootDirectories(): string[] {
+		return [
+			path.join("common", "rules_filters"),
+			path.join('rules', "windows"),
+			path.join('rules', "linux")
+		];
 	}
 
 	public getAppendixPath() : string {
@@ -107,9 +101,8 @@ export class EDRPathHelper extends PathLocator {
 	}
 
 	public isKbOpened() : boolean {
-		const kbPath = EDRPathHelper.get();
-		const requredFolders = kbPath.getContentRoots();
-		requredFolders.concat(kbPath.getRulesDirFilters());
+		const requredFolders = this.getContentRoots();
+		requredFolders.concat(this.getRulesDirFilters());
 		for (const folder of requredFolders){
 			if (!fs.existsSync(folder)){
 				return false;
@@ -117,4 +110,6 @@ export class EDRPathHelper extends PathLocator {
 		}
 		return true;
 	}
+
+	private _prefix = path.join("resources", "build-resources");
 }

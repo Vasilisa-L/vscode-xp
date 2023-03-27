@@ -5,12 +5,12 @@ import * as fs from 'fs';
 import { MustacheFormatter } from '../mustacheFormatter';
 import { ExtensionHelper } from '../../helpers/extensionHelper';
 import { RuleBaseItem } from '../../models/content/ruleBaseItem';
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 import { FileSystemHelper } from '../../helpers/fileSystemHelper';
 import { CorrGraphRunner } from './corrGraphRunner';
 import { RegExpHelper } from '../../helpers/regExpHelper';
 import { ExceptionHelper } from '../../helpers/exceptionHelper';
-import { TestHelper } from '../../helpers/testHelper';
+import { ConvertMimeType, TestHelper } from '../../helpers/testHelper';
 
 export class RunningCorrelationGraphProvider {
 
@@ -27,7 +27,7 @@ export class RunningCorrelationGraphProvider {
 
         // Форма создания корреляции.
         const createCorrelationTemplateFilePath = path.join(
-            ExtensionHelper.getExtentionPath(), "client", "templates", "FullGraphRun.html");
+            Configuration.get().getExtentionPath(), "client", "templates", "FullGraphRun.html");
 
         const reateCorrelationTemplateContent = fs.readFileSync(createCorrelationTemplateFilePath).toString();
         const createCorrelationViewProvider = new RunningCorrelationGraphProvider(
@@ -109,8 +109,7 @@ export class RunningCorrelationGraphProvider {
 
     private async corrGraphRun(rawEventsPath: string) : Promise<void> {
 
-        const kbPaths = Configuration.get().getPathHelper();
-        const roots = kbPaths.getContentRoots();
+        const roots = this._config.getContentRoots();
 
         // Прогоняем событие по графам для каждой из корневых директорий теущего режима
         roots.forEach(root => {
@@ -152,7 +151,7 @@ export class RunningCorrelationGraphProvider {
 	}
 
 	private async addEnvelope(message: any) {
-		
+
 		let rawEvents = message?.rawEvents as string;
 		if(!rawEvents) {
 			return ExtensionHelper.showUserInfo("Не заданы сырые события для теста. Добавьте их и повторите.");
@@ -163,7 +162,7 @@ export class RunningCorrelationGraphProvider {
 			return ExtensionHelper.showUserInfo("Конверт для событий уже добавлен.");
 		}
 
-		const mimeType = message?.mimeType as string;
+		const mimeType = message?.mimeType as ConvertMimeType;
 		if(!mimeType) {
 			ExtensionHelper.showUserInfo("Не задан mime. Добавьте задайте его и повторите.");
 			return;

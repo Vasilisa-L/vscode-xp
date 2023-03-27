@@ -9,7 +9,7 @@ import { ExtensionHelper } from '../../helpers/extensionHelper';
 import { IntegrationTest } from '../tests/integrationTest';
 import { ContentTreeProvider } from '../../views/contentTree/contentTreeProvider';
 import { FileSystemHelper } from '../../helpers/fileSystemHelper';
-import { Configuration } from '../configuration';
+import { Configuration } from '../config/configuration';
 import { KbHelper } from '../../helpers/kbHelper';
 import { ContentHelper } from '../../helpers/contentHelper';
 
@@ -162,8 +162,8 @@ export class Enrichment extends RuleBaseItem {
 	}
  
 	iconPath = {
-		light: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'light', 'rule.svg'),
-		dark: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'dark', 'rule.svg')
+		light: path.join(Configuration.get().getExtentionPath(), 'resources', 'light', 'rule.svg'),
+		dark: path.join(Configuration.get().getExtentionPath(), 'resources', 'dark', 'rule.svg')
 	};
 
 	contextValue = 'Enrichment';

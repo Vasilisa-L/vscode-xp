@@ -6,6 +6,7 @@ import { RuleBaseItem } from './ruleBaseItem';
 import { ExtensionHelper } from '../../helpers/extensionHelper';
 import { MetaInfo } from '../metaInfo/metaInfo';
 import { ContentTreeProvider } from '../../views/contentTree/contentTreeProvider';
+import { Configuration } from '../config/configuration';
 
 export class Table extends RuleBaseItem {
 
@@ -74,8 +75,8 @@ export class Table extends RuleBaseItem {
 	}
 
 	iconPath = {
-		light: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'light', 'rule.svg'),
-		dark: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'dark', 'rule.svg')
+		light: path.join(Configuration.get().getExtentionPath(), 'resources', 'light', 'rule.svg'),
+		dark: path.join(Configuration.get().getExtentionPath(), 'resources', 'dark', 'rule.svg')
 	};
 
 	contextValue = 'Table';

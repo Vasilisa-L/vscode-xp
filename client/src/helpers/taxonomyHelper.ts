@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { Configuration } from '../models/configuration';
+import { Configuration } from '../models/config/configuration';
 import { TaxonomyFieldDetails } from '../providers/taxonomyFieldDetails';
 import { FileSystemHelper } from './fileSystemHelper';
 import { YamlHelper } from './yamlHelper';

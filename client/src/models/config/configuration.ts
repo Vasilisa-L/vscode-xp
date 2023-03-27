@@ -3,45 +3,70 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 
-import { ExtensionHelper } from '../helpers/extensionHelper';
 import { Guid } from 'guid-typescript';
-import { FileSystemHelper } from '../helpers/fileSystemHelper';
-import { VsCodeApiHelper } from '../helpers/vsCodeApiHelper';
-import { FileNotFoundException } from './fileNotFounException';
-import { XpException as XpException } from './xpException';
-import { ContentType } from '../contentType/contentType';
-import { Localization } from './content/localization';
-import { EDRPathHelper } from './locator/EDRPathLocator';
-import { OsType, PathLocator } from './locator/pathLocator';
-import { SIEMPathHelper } from './locator/SIEMPathLocator';
+import { FileNotFoundException } from '../fileNotFounException';
+import { XpException} from '../xpException';
+import { ContentType } from '../../contentType/contentType';
+import { Localization } from '../content/localization';
+import { config } from '../../extension';
 
-export class Configuration {
+export enum OsType {
+	Windows,
+	Linux,
+	Mac
+}
 
-	private constructor(context: vscode.ExtensionContext) {
+export abstract class Configuration {
+
+	public constructor(context: vscode.ExtensionContext) {
 
 		this._context = context;
+		this._kbFullPath =
+			(vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
+			? vscode.workspace.workspaceFolders[0].uri.fsPath
+			: undefined;
 
 		const contentType = this.getContentType();
 		this.setContentType(contentType);
 
 		const extentionName = this.getExtentionDisplayName();
 		this._outputChannel = vscode.window.createOutputChannel(extentionName);
-		this._diagnosticCollection = vscode.languages.createDiagnosticCollection(extentionName);
 
+		this._diagnosticCollection = vscode.languages.createDiagnosticCollection(extentionName);
 		context.subscriptions.push(this._diagnosticCollection);
 	}
 
-	public getPathHelper(): PathLocator {
-		return this._pathHelper;
+	// Специфика СЗИ
+	public abstract getCorrulesGraphFilePath(rootFolder: string) : string;
+	public abstract getRootByPath(directory: string): string;
+	public abstract getTablesContract() : string;
+	public abstract getContentRoots() : string[];
+	public abstract getPackages() : string[];
+	public abstract getRequiredRootDirectories(): string[];
+	public abstract getAppendixPath() : string;
+	public abstract getRulesDirFilters() : string;
+	public abstract isKbOpened() : boolean;
+	public abstract getOutputDirectoryPath() : string;
+
+	protected abstract getOutputSpecificSubDirName(): string;
+
+
+	protected checkKbPath() : void {
+		if(!this._kbFullPath) {
+			throw new XpException(`База знаний не открыта.`);
+		}
+	
+		if(!fs.existsSync(this._kbFullPath)) {
+			throw new FileNotFoundException(`Некорректный путь '${this._kbFullPath}'`, this._kbFullPath);
+		}
+	}
+
+	public getKbFullPath() : string {
+		return this._kbFullPath;
 	}
 
 	public setContentType(contentType: ContentType) {
-		if (contentType === ContentType.EDR) {
-			this._pathHelper = EDRPathHelper.get();
-		}
-		else {
-			this._pathHelper = SIEMPathHelper.get(); 
-		}
+		this._contentType = contentType;
 		this._context.workspaceState.update("ContentType", contentType);
 	}
 
@@ -252,65 +277,48 @@ export class Configuration {
 		return fullPath;
 	}
 
-	public getOutputDirectoryPath(rootFolder: string = "") : string {
-		const extensionSettings = vscode.workspace.getConfiguration("xpConfig");
-		const outputDirectoryPath = extensionSettings.get<string>("outputDirectoryPath");
-
-		if (!outputDirectoryPath || outputDirectoryPath === ""){
-			throw new FileNotFoundException(
-				`Выходная директория не задана. Задайте путь к [ней](command:workbench.action.openSettings?["xpConfig.outputDirectoryPath"])`,
-				outputDirectoryPath);
-		}
-
-		if (!fs.existsSync(outputDirectoryPath)){
-			throw new FileNotFoundException(
-				`Выходная директория не найдена по пути ${outputDirectoryPath}. Проверьте путь к [ней](command:workbench.action.openSettings?["xpConfig.outputDirectoryPath"])`,
-				outputDirectoryPath);
-		}
-
-		return path.join(outputDirectoryPath, rootFolder);
+	public getCorrelationDefaultsFilePath() : string {
+		return path.join(this.getOutputDirectoryPath(), "correlation_defaults.json");
 	}
 
-	public getCorrelationDefaultsFilePath(rootFolder: string) : string {
-		return path.join(this.getOutputDirectoryPath(rootFolder), "correlation_defaults.json");
+	public getSchemaFullPath() : string {
+		return path.join(this.getOutputDirectoryPath(), "schema.json");
 	}
 
-	public getSchemaFullPath(rootFolder: string) : string {
-		return path.join(this.getOutputDirectoryPath(rootFolder), "schema.json");
+	public getNormEventsFilePath() : string {
+		return path.join(this.getOutputDirectoryPath(), "norm_events.json");
 	}
 
-	public getNormEventsFilePath(rootFolder: string) : string {
-		return path.join(this.getOutputDirectoryPath(rootFolder), "norm_events.json");
+	public getEnrichEventsFilePath() : string {
+		return path.join(this.getOutputDirectoryPath(), "enrich_events.json");
 	}
 
-	public getEnrichEventsFilePath(rootFolder: string) : string {
-		return path.join(this.getOutputDirectoryPath(rootFolder), "enrich_events.json");
-	}
-
-	public getCorrEventsFilePath(rootFolder: string) : string {
-		return path.join(this.getOutputDirectoryPath(rootFolder), "corr_events.json");
+	public getCorrEventsFilePath() : string {
+		return path.join(this.getOutputDirectoryPath(), "corr_events.json");
 	}
 
 	public getNormGraphFilePath() : string {
-		const root = this._pathHelper.getOutputDirName();
-		return path.join(this.getOutputDirectoryPath(root), "formulas_graph.json");
+		return path.join(
+			this.getOutputDirectoryPath(),
+			this.getOutputSpecificSubDirName(),
+			"formulas_graph.json"
+		);
 	}
 
 	public getEnrulesGraphFilePath() : string {
-		const root = this._pathHelper.getOutputDirName();
-		return path.join(this.getOutputDirectoryPath(root), "enrules_graph.json");
+		return path.join(
+			this.getOutputDirectoryPath(), 
+			this.getOutputSpecificSubDirName(),
+			"enrules_graph.json"
+		);
 	}
 
-	public getCorrulesGraphFilePath(rootFolder: string) : string {
-		return path.join(this.getOutputDirectoryPath(rootFolder), this._pathHelper.getCorrulesGraphFileName());
-	}
-
-	public getFptaDbFilePath(rootFolder: string) : string {
-		return path.join(this.getOutputDirectoryPath(rootFolder), "fpta_db.db");
+	public getFptaDbFilePath() : string {
+		return path.join(this.getOutputDirectoryPath(), "fpta_db.db");
 	}
 
 	public getTmpDirectoryPath() : string {
-		return path.join(this.getOutputDirectoryPath(""), "temp");
+		return path.join(this.getOutputDirectoryPath(), "temp");
 	}
 
 	public getTmpSiemjConfigPath() : string {
@@ -403,33 +411,15 @@ export class Configuration {
 	}
 
 	public static get() {
-		if(!this._instance) {
+		if(!config) {
 			throw new XpException("Конфигурация расширения не получена. Возможно, она не была инициализирована.");
 		}
-        return this._instance;
+        return config;
     }
 
-	public static async init(context : vscode.ExtensionContext) : Promise<Configuration> {
-		this._instance = new Configuration(context);
+	private _kbFullPath: string;
 
-		let outputDirPath : string;
-		try {
-			outputDirPath = this._instance.getOutputDirectoryPath();
-			if(!fs.existsSync(outputDirPath)) {
-				return this._instance;
-			}
-			await FileSystemHelper.clearDirectory(outputDirPath);
-		}
-		catch(error) {
-			console.warn(`Не удалось удалить временную директорию '${outputDirPath}'`);
-		}
-
-		return this._instance;
-	}
-
-	private static _instance : Configuration;
-
-	private _pathHelper: PathLocator;
+	private _contentType: ContentType;
 
 	private _outputChannel : vscode.OutputChannel;
 

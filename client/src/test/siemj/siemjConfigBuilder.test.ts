@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 
 import { SiemjConfBuilder } from '../../models/siemj/siemjConfigBuilder';
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 import { TestFixture } from '../helper';
 import { IntegrationTest } from '../../models/tests/integrationTest';
 

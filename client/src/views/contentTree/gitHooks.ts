@@ -3,7 +3,7 @@ import { Uri } from 'vscode';
 import { API, Branch } from '../../@types/vscode.git';
 import { FileSystemHelper } from '../../helpers/fileSystemHelper';
 
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 
 export class GitHooks {
 	constructor(private _git : API, private _config: Configuration) {}
@@ -39,8 +39,7 @@ export class GitHooks {
 	}
 
 	public getCurrentBranch() : Branch {
-		const ph = this._config.getPathHelper();
-		const kbPath = ph.getKbFullPath();
+		const kbPath = this._config.getKbFullPath();
 
 		const repository = this._git.getRepository(Uri.file(kbPath));
 		return repository.state.HEAD;

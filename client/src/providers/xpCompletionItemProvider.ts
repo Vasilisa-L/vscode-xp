@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as classTransformer from 'class-transformer';
 
 import { FileSystemHelper } from '../helpers/fileSystemHelper';
-import { Configuration } from '../models/configuration';
+import { Configuration } from '../models/config/configuration';
 import { CompleteSignature } from './signature/completeSignature';
 import { TaxonomyHelper } from '../helpers/taxonomyHelper';
 import { ExtensionHelper } from '../helpers/extensionHelper';

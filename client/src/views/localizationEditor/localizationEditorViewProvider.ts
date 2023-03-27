@@ -7,7 +7,7 @@ import { MustacheFormatter } from '../mustacheFormatter';
 import { Localization, LocalizationLanguage } from '../../models/content/localization';
 import { RuleBaseItem } from '../../models/content/ruleBaseItem';
 import { Correlation } from '../../models/content/correlation';
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 import { StringHelper } from '../../helpers/stringHelper';
 
 export class LocalizationEditorViewProvider  {
@@ -24,7 +24,7 @@ export class LocalizationEditorViewProvider  {
 	public static init(context: vscode.ExtensionContext) {
 
 		const templateFilePath = path.join(
-			ExtensionHelper.getExtentionPath(), "client", "templates", "LocalizationEditor.html");
+			Configuration.get().getExtentionPath(), "client", "templates", "LocalizationEditor.html");
 
 		const provider = new LocalizationEditorViewProvider(templateFilePath);
 	

@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { ExtensionHelper } from '../../../helpers/extensionHelper';
 import { ProcessHelper } from '../../../helpers/processHelper';
 import { VsCodeApiHelper } from '../../../helpers/vsCodeApiHelper';
-import { Configuration } from '../../../models/configuration';
+import { Configuration } from '../../../models/config/configuration';
 import { RuleBaseItem } from '../../../models/content/ruleBaseItem';
 import { ContentTreeProvider } from '.././contentTreeProvider';
 
@@ -24,8 +24,7 @@ export class UnpackKbPackageAction {
 			return;
 		}
 
-		const pathHelper = Configuration.get().getPathHelper();
-		if(!pathHelper.isKbOpened()) {
+		if(!this._config.isKbOpened()) {
 			ExtensionHelper.showUserInfo("Нельзя распаковать пакет(ы) без открытия существующей базы знаний. Сначала откройте базу знаний.");
 			return;
 		}
@@ -44,7 +43,7 @@ export class UnpackKbPackageAction {
 		const kbFilePath = kbUris[0].fsPath; 
 
 		// Получаем путь к директории пакетов.
-		const exportDirPath = selectedPackage.getContentRoot(Configuration.get());
+		const exportDirPath = selectedPackage.getContentRoot(this._config);
 
 		if(!fs.existsSync(exportDirPath)) {
 			ExtensionHelper.showUserError(`Не существует директория для пакетов.`);

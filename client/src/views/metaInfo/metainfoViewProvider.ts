@@ -7,7 +7,7 @@ import { RuleBaseItem } from '../../models/content/ruleBaseItem';
 import { Correlation } from '../../models/content/correlation';
 import { MustacheFormatter } from '../mustacheFormatter';
 import { MetaInfoUpdater } from './metaInfoUpdater';
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 import { IncorrectFieldFillingException } from '../incorrectFieldFillingException';
 import { ExceptionHelper } from '../../helpers/exceptionHelper';
 
@@ -26,7 +26,7 @@ export class MetainfoViewProvider  {
 
 	public static init(config: Configuration) : MetainfoViewProvider {
 		const metaInfoTemplateFilePath = path.join(
-			ExtensionHelper.getExtentionPath(), "client", "templates", "MetaInfo.html");
+			Configuration.get().getExtentionPath(), "client", "templates", "MetaInfo.html");
 		const metainfoTemplateContent = fs.readFileSync(metaInfoTemplateFilePath).toString();
 	
 		const metaInfoViewProvider = new MetainfoViewProvider(

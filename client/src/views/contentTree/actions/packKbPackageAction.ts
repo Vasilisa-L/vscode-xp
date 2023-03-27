@@ -8,7 +8,7 @@ import { FileSystemHelper } from '../../../helpers/fileSystemHelper';
 import { KbHelper } from '../../../helpers/kbHelper';
 import { ProcessHelper } from '../../../helpers/processHelper';
 import { VsCodeApiHelper } from '../../../helpers/vsCodeApiHelper';
-import { Configuration } from '../../../models/configuration';
+import { Configuration } from '../../../models/config/configuration';
 import { RuleBaseItem } from '../../../models/content/ruleBaseItem';
 
 export class PackKbPackageAction {

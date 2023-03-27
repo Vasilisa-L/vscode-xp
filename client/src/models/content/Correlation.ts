@@ -11,7 +11,7 @@ import { CorrelationUnitTest } from '../tests/correlationUnitTest';
 import { FileSystemHelper } from '../../helpers/fileSystemHelper';
 import { ContentTreeProvider } from '../../views/contentTree/contentTreeProvider';
 import { KbHelper } from '../../helpers/kbHelper';
-import { Configuration } from '../configuration';
+import { Configuration } from '../config/configuration';
 import { ContentHelper } from '../../helpers/contentHelper';
 
 export class Correlation extends RuleBaseItem {
@@ -196,8 +196,8 @@ export class Correlation extends RuleBaseItem {
 	}
 
 	iconPath = {
-		light: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'light', 'rule.svg'),
-		dark: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'dark', 'rule.svg')
+		light: path.join(Configuration.get().getExtentionPath(), 'resources', 'light', 'rule.svg'),
+		dark: path.join(Configuration.get().getExtentionPath(), 'resources', 'dark', 'rule.svg')
 	};
 
 	contextValue = 'Correlation';

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as classTransformer from 'class-transformer';
 
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 import { FileSystemHelper } from '../../helpers/fileSystemHelper';
 import { CompleteSignature } from '../signature/completeSignature';
 import { RegExpHelper } from '../../helpers/regExpHelper';

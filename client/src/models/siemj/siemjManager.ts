@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { FileSystemHelper } from '../../helpers/fileSystemHelper';
 import { ProcessHelper } from '../../helpers/processHelper';
-import { Configuration } from '../configuration';
+import { Configuration } from '../config/configuration';
 import { XpException } from '../xpException';
 import { RuleBaseItem } from '../content/ruleBaseItem';
 import { SiemjConfigHelper } from './siemjConfigHelper';
@@ -27,8 +27,7 @@ export class SiemjManager {
 
 		await SiemjConfigHelper.clearArtifacts(this._config);
 
-		const outputDirName = this._config.getPathHelper().getOutputDirName();
-		const outputFolder = this._config.getOutputDirectoryPath(outputDirName);
+		const outputFolder = this._config.getOutputDirectoryPath();
 
 		if(!fs.existsSync(outputFolder)) {
 			fs.mkdirSync(outputFolder);
@@ -55,7 +54,7 @@ export class SiemjManager {
 			this._config.getOutputChannel()
 		);
 
-		const normEventsFilePath = this._config.getNormEventsFilePath(outputDirName);
+		const normEventsFilePath = this._config.getNormEventsFilePath();
 		if(!fs.existsSync(normEventsFilePath)) {
 			throw new XpException("Ошибка нормализации событий. Файл с результирующим событием не создан.");
 		}
@@ -81,8 +80,7 @@ export class SiemjManager {
 
 		await SiemjConfigHelper.clearArtifacts(this._config);
 
-		const outputDirName = this._config.getPathHelper().getOutputDirName();
-		const outputFolder = this._config.getOutputDirectoryPath(outputDirName);
+		const outputFolder = this._config.getOutputDirectoryPath();
 
 		if(!fs.existsSync(outputFolder)) {
 			fs.mkdirSync(outputFolder);
@@ -112,7 +110,7 @@ export class SiemjManager {
 			this._config.getOutputChannel()
 		);
 
-		const enrichEventsFilePath = this._config.getEnrichEventsFilePath(outputDirName);
+		const enrichEventsFilePath = this._config.getEnrichEventsFilePath();
 		if(!fs.existsSync(enrichEventsFilePath)) {
 			throw new XpException("Ошибка нормализации событий. Файл с результирующим событием не создан.");
 		}

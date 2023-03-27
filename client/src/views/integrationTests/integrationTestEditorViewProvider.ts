@@ -4,12 +4,12 @@ import * as path from 'path';
 
 import { ExtensionHelper } from '../../helpers/extensionHelper';
 import { MustacheFormatter } from '../mustacheFormatter';
-import { TestHelper } from '../../helpers/testHelper';
+import { ConvertMimeType, TestHelper } from '../../helpers/testHelper';
 import { IntegrationTest } from '../../models/tests/integrationTest';
 import { Correlation } from '../../models/content/correlation';
 import { Enrichment } from '../../models/content/enrichment';
 import { RuleBaseItem } from '../../models/content/ruleBaseItem';
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 import { SiemjManager } from '../../models/siemj/siemjManager';
 import { UnitTestsRunner } from '../../models/tests/unitTestsRunner';
 import { FileSystemHelper } from '../../helpers/fileSystemHelper';
@@ -41,7 +41,7 @@ export class IntegrationTestEditorViewProvider  {
 
 		// Форма создания визуалиации интеграционных тестов.
 		const templatePath = path.join(
-			ExtensionHelper.getExtentionPath(), 
+			Configuration.get().getExtentionPath(), 
 			path.join("client", "templates", "IntegrationTestEditor.html")
 		);
 
@@ -110,11 +110,7 @@ export class IntegrationTestEditorViewProvider  {
 
 		const intergrationalTest = this._rule.getIntegrationTests();
 
-		// TODO: Унифицировать добавление во все вьюшки пути к расширению.
-		// Побрасываем специальный путь для доступа к ресурсам.
-		const config = Configuration.get();
-
-		const resoucesUri = config.getExtentionUri();
+		const resoucesUri = this._config.getExtentionUri();
 		const extensionBaseUri = this._view.webview.asWebviewUri(resoucesUri);
 
 		const plain = {
@@ -323,7 +319,7 @@ export class IntegrationTestEditorViewProvider  {
 			return ExtensionHelper.showUserInfo("Конверт для событий уже добавлен.");
 		}
 
-		const mimeType = message?.mimeType as string;
+		const mimeType = message?.mimeType as ConvertMimeType;
 		if(!mimeType) {
 			ExtensionHelper.showUserInfo("Не задан mime. Добавьте задайте его и повторите.");
 			return;
@@ -419,7 +415,7 @@ export class IntegrationTestEditorViewProvider  {
 			const modularTestContent = `${integrationalTestSimplifiedContent}\n\n${normalizedEvents}`;
 
 			// Сохраняем модульный тест во временный файл.
-			const randTmpPath = Configuration.get().getRandTmpSubDirectoryPath();
+			const randTmpPath = this._config.getRandTmpSubDirectoryPath();
 			await fs.promises.mkdir(randTmpPath);
 
 			const fastTestFilePath = path.join(randTmpPath, "fast_test.sc");

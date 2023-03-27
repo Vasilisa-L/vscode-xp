@@ -4,7 +4,7 @@ import * as path from 'path';
 import { ExtensionHelper } from '../../helpers/extensionHelper';
 import { FileSystemHelper } from '../../helpers/fileSystemHelper';
 import { ProcessHelper } from '../../helpers/processHelper';
-import { Configuration } from '../../models/configuration';
+import { Configuration } from '../../models/config/configuration';
 import { VsCodeApiHelper } from '../../helpers/vsCodeApiHelper';
 import { XpException } from '../../models/xpException';
 import { SiemjConfBuilder } from '../../models/siemj/siemjConfigBuilder';
@@ -24,9 +24,7 @@ export class CorrGraphRunner {
 		}
 
 		// В зависимости от типа контента получаем нужную выходную директорию.
-		const root = this._config.getPathHelper().getRootByPath(correlationsFullPath);
-		const rootFolder = path.basename(root);
-		const outputFolder = this._config.getOutputDirectoryPath(rootFolder);
+		const outputFolder = this._config.getOutputDirectoryPath();
 
 		if(!fs.existsSync(outputFolder)) {
 			await fs.promises.mkdir(outputFolder);
@@ -54,13 +52,13 @@ export class CorrGraphRunner {
 		await FileSystemHelper.writeContentFile(siemjConfigPath, siemjConfContent);
 
 		// Без удаления базы возникали странные ошибки filler-а, но это не точно.
-		const ftpaDbPath = this._config.getFptaDbFilePath(rootFolder);
+		const ftpaDbPath = this._config.getFptaDbFilePath();
 		if(fs.existsSync(ftpaDbPath)) {
 			await fs.promises.unlink(ftpaDbPath);
 		}
 		
 		// Удаляем скорреклированные события, если такие были.
-		const corrEventFilePath = this._config.getCorrEventsFilePath(rootFolder);
+		const corrEventFilePath = this._config.getCorrEventsFilePath();
 		if(fs.existsSync(corrEventFilePath)) {
 			await fs.promises.unlink(corrEventFilePath);
 		}
@@ -72,7 +70,7 @@ export class CorrGraphRunner {
 			["-c", siemjConfigPath, "main"],
 			this._config.getOutputChannel());
 
-		const corrEventsFilePath = this._config.getCorrEventsFilePath(rootFolder);
+		const corrEventsFilePath = this._config.getCorrEventsFilePath();
 		if(!fs.existsSync(corrEventsFilePath)) {
 			throw new XpException("Ошибка прогона события на графе корреляций.");
 		}

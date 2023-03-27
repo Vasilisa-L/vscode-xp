@@ -6,7 +6,7 @@ import { KbHelper } from '../../../helpers/kbHelper';
 import { RuleBaseItem } from '../../../models/content/ruleBaseItem';
 import { ContentTreeProvider } from '../contentTreeProvider';
 import { FileSystemHelper } from '../../../helpers/fileSystemHelper';
-import { Configuration } from '../../../models/configuration';
+import { Configuration } from '../../../models/config/configuration';
 import { YamlHelper } from '../../../helpers/yamlHelper';
 import { MetaInfo } from '../../../models/metaInfo/metaInfo';
 

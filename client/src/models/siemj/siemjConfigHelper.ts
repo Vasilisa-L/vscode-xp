@@ -1,18 +1,17 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { Configuration } from '../configuration';
+import { Configuration } from '../config/configuration';
 import { RuleBaseItem } from '../content/ruleBaseItem';
 import { SiemjConfBuilder } from './siemjConfigBuilder';
 
 export class SiemjConfigHelper {
 
 	public static getBuildAllGraphs(config : Configuration ) : string[] {
-		const kbPaths = Configuration.get().getPathHelper();
-		const roots = kbPaths.getContentRoots();
+		const roots = config.getContentRoots();
 
 		return roots.map(root => { 
-			const output_folder = config.getOutputDirectoryPath(path.basename(root));
+			const output_folder = config.getOutputDirectoryPath();
 			if(!fs.existsSync(output_folder)) {
 				fs.mkdirSync(output_folder, {recursive: true});
 			}
@@ -42,21 +41,21 @@ export class SiemjConfigHelper {
 		const buildTools = config.getBuildToolsDirectoryFullPath();
 		const taxonomy = config.getTaxonomyFullPath();
 
-		const root = config.getPathHelper().getRootByPath(rule.getDirectoryPath());
-		const outputFolder = config.getOutputDirectoryPath(path.basename(root));
+		const outputFolder = config.getOutputDirectoryPath();
 
 		if(!fs.existsSync(outputFolder)) {
 			fs.mkdirSync(outputFolder, {recursive: true});
 		}
 		const temp = config.getTmpDirectoryPath();
-		const kbPaths = Configuration.get().getPathHelper();
-		const rulesSrc = rule.getContentRoot(config);
-		const xpAppendixPath = kbPaths.getAppendixPath();
-		const tables_contract = kbPaths.getTablesContract();
-		const rfiltersSrc = kbPaths.getRulesDirFilters();
+		
+		const xpAppendixPath = config.getAppendixPath();
+		const tables_contract = config.getTablesContract();
+		const rfiltersSrc = config.getRulesDirFilters();
 
 		// Путь к пакету нужен для сборки сабрулей.
 		const packagePath = rule.getPackagePath(config);
+
+		const rulesSrc = rule.getContentRoot(config);
 
 		// Проверяем наличие графа нормализации.
 		const testRuleFullPath = rule.getDirectoryPath();
@@ -128,19 +127,18 @@ scenario=make-nfgraph make-tables-schema make-tables-db make-ergraph make-crgrap
 	 * Очищаем артефакты запуска siemj. Неоходимо для невозможности получения неактуальных данных из них.
 	 */
 	public static async clearArtifacts(config : Configuration) : Promise<void> {
-		const outputDirName = config.getPathHelper().getOutputDirName();
 
-		const ftpdDbFilePath = config.getFptaDbFilePath(outputDirName);
+		const ftpdDbFilePath = config.getFptaDbFilePath();
 		if(fs.existsSync(ftpdDbFilePath)) {
 			await fs.promises.unlink(ftpdDbFilePath);
 		}
 
-		const normEventsFilePath = config.getNormEventsFilePath(outputDirName);
+		const normEventsFilePath = config.getNormEventsFilePath();
 		if(fs.existsSync(normEventsFilePath)) {
 			await fs.promises.unlink(normEventsFilePath);
 		}
 
-		const enrichEventsFilePath = config.getEnrichEventsFilePath(outputDirName);
+		const enrichEventsFilePath = config.getEnrichEventsFilePath();
 		if(fs.existsSync(enrichEventsFilePath)) {
 			await fs.promises.unlink(enrichEventsFilePath);
 		}

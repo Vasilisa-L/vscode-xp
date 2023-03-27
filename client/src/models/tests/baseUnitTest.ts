@@ -3,6 +3,7 @@ import * as path from "path";
 
 import { ExtensionHelper } from '../../helpers/extensionHelper';
 import { TestStatus } from './testStatus';
+import { Configuration } from '../config/configuration';
 
 export abstract class BaseUnitTest extends vscode.TreeItem {
 
@@ -68,24 +69,24 @@ export abstract class BaseUnitTest extends vscode.TreeItem {
 		switch (this._status) {
 			case TestStatus.Unknown: {
 				this.iconPath = {
-					light: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'light', 'document.svg'),
-					dark: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'dark', 'document.svg')
+					light: path.join(Configuration.get().getExtentionPath(), 'resources', 'light', 'document.svg'),
+					dark: path.join(Configuration.get().getExtentionPath(), 'resources', 'dark', 'document.svg')
 				};
 				return;
 			}
 
 			case TestStatus.Success: {
 				this.iconPath = {
-					light: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'light', 'success.svg'),
-					dark: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'dark', 'success.svg')
+					light: path.join(Configuration.get().getExtentionPath(), 'resources', 'light', 'success.svg'),
+					dark: path.join(Configuration.get().getExtentionPath(), 'resources', 'dark', 'success.svg')
 				};
 				return;
 			}
 
 			case TestStatus.Failed: {
 				this.iconPath = {
-						light: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'light', 'failed.svg'),
-						dark: path.join(ExtensionHelper.getExtentionPath(), 'resources', 'dark', 'failed.svg')
+						light: path.join(Configuration.get().getExtentionPath(), 'resources', 'light', 'failed.svg'),
+						dark: path.join(Configuration.get().getExtentionPath(), 'resources', 'dark', 'failed.svg')
 				};
 				return;
 			}

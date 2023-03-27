@@ -7,7 +7,7 @@ import { getDocUri, activate, TestFixture } from '../../helper';
 import { TestHelper } from '../../../helpers/testHelper';
 import { Correlation } from '../../../models/content/correlation';
 import { ContentHelper } from '../../../helpers/contentHelper';
-import { Configuration } from '../../../models/configuration';
+import { Configuration } from '../../../models/config/configuration';
 
 suite('CorrelationHelper.createCorrelationFromTemplate', async () => {
 

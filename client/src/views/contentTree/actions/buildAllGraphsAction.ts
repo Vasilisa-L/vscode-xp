@@ -5,7 +5,7 @@ import { ExtensionHelper } from '../../../helpers/extensionHelper';
 import { ProcessHelper } from '../../../helpers/processHelper';
 import { SiemjConfigHelper } from '../../../models/siemj/siemjConfigHelper';
 import { SiemJOutputParser } from '../../integrationTests/siemJOutputParser';
-import { Configuration } from '../../../models/configuration';
+import { Configuration } from '../../../models/config/configuration';
 import { ExceptionHelper } from '../../../helpers/exceptionHelper';
 
 export class BuildAllGraphsAction {
