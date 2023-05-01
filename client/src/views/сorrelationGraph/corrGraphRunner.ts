@@ -6,6 +6,7 @@ import { ProcessHelper } from '../../helpers/processHelper';
 import { Configuration } from '../../models/configuration';
 import { XpException } from '../../models/xpException';
 import { SiemjConfBuilder } from '../../models/siemj/siemjConfigBuilder';
+import { ExtensionHelper } from '../../helpers/extensionHelper';
 
 export class CorrGraphRunner {
 
@@ -66,10 +67,14 @@ export class CorrGraphRunner {
 
 		// Типовая команда выглядит так:
 		// "C:\\PTSIEMSDK_GUI.4.0.0.738\\tools\\siemj.exe" -c C:\\PTSIEMSDK_GUI.4.0.0.738\\temp\\siemj.conf main");
-		const result = await ProcessHelper.ExecuteWithArgsWithRealtimeOutput(
+		const status = await ProcessHelper.executeWithArgsWithRealtimeOutput(
 			siemjExePath,
 			["-c", siemjConfigPath, "main"],
 			this._config.getOutputChannel());
+
+		if(status.isInterrapted) {
+			throw new XpException("Операция прервана пользователем.");
+		}
 
 		const corrEventsFilePath = this._config.getCorrelatedEventsFilePath(rootFolder);
 		if(!fs.existsSync(corrEventsFilePath)) {

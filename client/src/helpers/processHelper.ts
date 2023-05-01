@@ -1,6 +1,14 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as child_process from 'child_process';
+import { XpException } from '../models/xpException';
+import { integer } from 'vscode-languageclient';
+
+export interface ProcessStatus {
+	output: string;
+	exitCode: integer;
+	isInterrapted : boolean
+}
 
 export class ProcessHelper {
 	public static readProcessPathArgsOutputSync(command: string, args: string[], encoding: BufferEncoding) : string {
@@ -48,106 +56,74 @@ export class ProcessHelper {
 
 		return childProcess.stdout;
 	}
-
 	
-	public static StdIOExecuteWithArgsWithRealtimeOutput(
-		filePath: string, 
-		command : string, params : string[], 
-		outputChannel : vscode.OutputChannel) : Promise<string> {
+	public static executeWithArgsWithRealtimeOutput(
+		command : string,
+		params : string[],
+		outputChannel : vscode.OutputChannel,
+		token?: vscode.CancellationToken) : Promise<ProcessStatus> {
 
 		return new Promise(function(resolve, reject) {
-
-			const file = fs.readFileSync(filePath);
-			
-			let child; 
+			let child: child_process.ChildProcessWithoutNullStreams; 
 			try {
 				child = child_process.spawn(command, params);
 			} 
 			catch(error) {
-				reject(error.message);
+				reject(error);
 				return;
 			}
 
-			child.stdin.write(file);
-			child.stdin.end();
+			token.onCancellationRequested( (e) => {
+				child.kill();
+				resolve({
+					exitCode: child.exitCode,
+					isInterrapted : true,
+					output : output
+				});
+			});
 		
 			let output = "";
-		
-			child.stdout.setEncoding('utf8');
-			child.stdout.on('data', function(data) {
-				output += data.toString();
-				//outputChannel.append(data.toString());
-			});
-
-			child.stdout.setEncoding('utf8');
-			child.stdout.on("error", function(data) {
-				outputChannel.append(data.toString());
-				output += data.toString();
-			});
-		
-			child.stderr.setEncoding('utf8');
-			child.stderr.on('data', function(data) {
-				outputChannel.append(data.toString());
-				reject(data.toString());				
-			});
-		
-			child.on('close', function(code) {
-				resolve(output);
-			});
-		});
-	}	
-
-	public static ExecuteWithArgsWithRealtimeOutput(command : string, params : string[], outputChannel : vscode.OutputChannel) : Promise<string> {
-
-		return new Promise(function(resolve, reject) {
-			let child; 
-			try {
-				child = child_process.spawn(command, params);
-			} 
-			catch(error) {
-				reject(error.message);
-				return;
-			}
-		
-			let output = "";
-		
-			child.stdout.setEncoding('utf8');
+			child.stdout.setEncoding(ProcessHelper.outputEncoding);
 			child.stdout.on('data', function(data) {
 				output += data.toString();
 				outputChannel.append(data.toString());
 			});
 
-			child.stdout.setEncoding('utf8');
+			child.stdout.setEncoding(ProcessHelper.outputEncoding);
 			child.stdout.on("error", function(data) {
 				outputChannel.append(data.toString());
 				output += data.toString();
 			});
 		
-			child.stderr.setEncoding('utf8');
+			child.stderr.setEncoding(ProcessHelper.outputEncoding);
 			child.stderr.on('data', function(data) {
 				outputChannel.append(data.toString());
 				output += data.toString();
 			});
 		
 			child.on('close', function(code) {
-				resolve(output);
+				resolve({
+					exitCode: child.exitCode,
+					isInterrapted : false,
+					output : output
+				});
 			});
 		});
 	}
 
-	public static ExecuteWithArgsWithRealtimeEmmiterOutput(command : string, params : string[], emmiter : vscode.EventEmitter<string>) : Promise<string> {
+	public static executeWithArgsWithRealtimeEmmiterOutput(command : string, params : string[], emmiter : vscode.EventEmitter<string>) : Promise<string> {
 
 		return new Promise(function(resolve, reject) {
 			
 			// Записываем в лог выполнения строку запуска
 			emmiter.fire(`\n\nXP :: Run command: ${command} ${params.join(' ')}\n`);
 
-			let child; 
+			let child: child_process.ChildProcessWithoutNullStreams; 
 			try {
 				child = child_process.spawn(command, params);
 			} 
 			catch(error) {
-				reject(error.message);
+				reject(error);
 				return;
 			}
 		
@@ -195,4 +171,6 @@ export class ProcessHelper {
 
 		return childProcess.stdout;
 	}
+
+	public static outputEncoding : BufferEncoding = 'utf8';
 }

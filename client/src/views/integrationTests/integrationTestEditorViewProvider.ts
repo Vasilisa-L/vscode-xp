@@ -473,7 +473,7 @@ export class IntegrationTestEditorViewProvider  {
 			location: vscode.ProgressLocation.Notification,
 			cancellable: false,
 			title: `Интеграционные тесты для правила '${this._rule.getName()}'`
-		}, async (progress) => {
+		}, async (progress, token : vscode.CancellationToken) => {
 
 			await VsCodeApiHelper.saveRuleCodeFile(this._rule);
 
@@ -497,7 +497,7 @@ export class IntegrationTestEditorViewProvider  {
 			}
 
 			try {
-				const executedTests = await testRunner.run(this._rule);
+				const executedTests = await testRunner.run(this._rule, token);
 
 				if(executedTests.every(it => it.getStatus() === TestStatus.Success)) {
 					ExtensionHelper.showUserInfo(`Интеграционные тесты завершились успешно.`);

@@ -17,7 +17,7 @@ export class IntegrationTestRunner {
 	constructor(private _config: Configuration, private _outputParser: SiemJOutputParser) {
 	}
 
-	public async run(rule : RuleBaseItem) : Promise<IntegrationTest[]> {
+	public async run(rule : RuleBaseItem, token : vscode.CancellationToken) : Promise<IntegrationTest[]> {
 
 		const integrationTests = rule.getIntegrationTests();
 		if(integrationTests.length == 0) {
@@ -78,14 +78,20 @@ export class IntegrationTestRunner {
 		// Типовая команда выглядит так:
 		// "C:\\PTSIEMSDK_GUI.4.0.0.738\\tools\\siemj.exe" -c C:\\PTSIEMSDK_GUI.4.0.0.738\\temp\\siemj.conf main
 		const siemjExePath = this._config.getSiemjPath();
-		const siemJOutput = await ProcessHelper.ExecuteWithArgsWithRealtimeOutput(
+		const siemjStatus = await ProcessHelper.executeWithArgsWithRealtimeOutput(
 			siemjExePath,
 			["-c", siemjConfigPath, "main"],
-			this._config.getOutputChannel());
+			this._config.getOutputChannel(),
+			token);
+
+		if(siemjStatus.isInterrapted) {
+			ExtensionHelper.showUserInfo("Операция прервана пользователем.");
+			return;
+		}
 
 		const ruleFileUri = vscode.Uri.file(rule.getRuleFilePath());
 
-		if(siemJOutput.includes(this.TEST_SUCCESS_SUBSTRING)) {
+		if(siemjStatus.output.includes(this.TEST_SUCCESS_SUBSTRING)) {
 			integrationTests.forEach(it => it.setStatus(TestStatus.Success));
 
 			// Убираем ошибки по текущему правилу.
@@ -96,7 +102,7 @@ export class IntegrationTestRunner {
 			this._config.getOutputChannel().show();
 			this._config.getDiagnosticCollection().clear();
 
-			let ruleFileDiagnostics = await this._outputParser.parse(siemJOutput);
+			let ruleFileDiagnostics = await this._outputParser.parse(siemjStatus.output);
 
 			// Фильтруем диагностики по текущему правилу.
 			ruleFileDiagnostics = ruleFileDiagnostics.filter(rfd => {
@@ -117,11 +123,9 @@ export class IntegrationTestRunner {
 
 		try {
 			// Очищаем временные файлы.
-			await fs.promises.access(siemjConfigPath).then(
-				() => { 
-					return fs.promises.unlink(siemjConfigPath); 
-				}
-			);
+			if(fs.existsSync(siemjConfigPath)) {
+				return fs.promises.unlink(siemjConfigPath);
+			}
 		}
 		catch (error) {
 			//

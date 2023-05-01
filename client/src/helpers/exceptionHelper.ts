@@ -1,4 +1,4 @@
-import { FileNotFoundException } from '../models/fileNotFounException';
+import { FileSystemException } from '../models/fileSystemException';
 import { XpException } from '../models/xpException';
 import { IncorrectFieldFillingException } from '../views/incorrectFieldFillingException';
 import { ExtensionHelper } from './extensionHelper';
@@ -9,10 +9,10 @@ export class ExceptionHelper {
 
 		switch(errorType)  {
 			case XpException.name : 
-			case FileNotFoundException.name : 
+			case FileSystemException.name : 
 			case IncorrectFieldFillingException.name :  {
 				const typedError = error as XpException;
-				return ExtensionHelper.showError(typedError.message, error);
+				return ExtensionHelper.showNonCriticalError(typedError.message, error);
 			}
 			default: {
 				if(userInfo) {

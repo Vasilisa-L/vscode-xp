@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 
 import { Guid } from 'guid-typescript';
 import { FileSystemHelper } from '../helpers/fileSystemHelper';
-import { FileNotFoundException } from './fileNotFounException';
+import { FileSystemException } from './fileSystemException';
 import { XpException as XpException } from './xpException';
 import { ContentType } from '../contentType/contentType';
 import { Localization } from './content/localization';
@@ -285,13 +285,13 @@ export class Configuration {
 		const outputDirectoryPath = extensionSettings.get<string>("outputDirectoryPath");
 
 		if (!outputDirectoryPath || outputDirectoryPath === ""){
-			throw new FileNotFoundException(
+			throw new FileSystemException(
 				`Выходная директория не задана. Задайте путь к [ней](command:workbench.action.openSettings?["xpConfig.outputDirectoryPath"])`,
 				outputDirectoryPath);
 		}
 
 		if (!fs.existsSync(outputDirectoryPath)){
-			throw new FileNotFoundException(
+			throw new FileSystemException(
 				`Выходная директория не найдена по пути ${outputDirectoryPath}. Проверьте путь к [ней](command:workbench.action.openSettings?["xpConfig.outputDirectoryPath"])`,
 				outputDirectoryPath);
 		}
@@ -512,13 +512,13 @@ export class Configuration {
 
 	private checkKbtToolPath(name : string, fullPath : string) : void {
 		if (!fullPath || fullPath === ""){
-			throw new FileNotFoundException(
+			throw new FileSystemException(
 				`Путь к '${name}' не найден. Проверьте [настройки](command:workbench.action.openSettings?["xpConfig.kbtBaseDirectory"])`,
 				fullPath);
 		}
 
 		if (!fs.existsSync(fullPath)){
-			throw new FileNotFoundException(
+			throw new FileSystemException(
 				`Путь к ${fullPath} не найден. Проверьте [настройки](command:workbench.action.openSettings?["xpConfig.kbtBaseDirectory"])`,
 				fullPath);
 		}

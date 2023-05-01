@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { Configuration } from '../models/configuration';
 
 export class ExtensionHelper {
 	/**
@@ -27,13 +28,31 @@ export class ExtensionHelper {
 		return vscode.window.showErrorMessage(infoMessage);
 	}
 
-	static showError(userMessage: string, error: Error) {
-		const message = `\n\nMessage: ${error.message}`;
-		const stack = `\n\nStack Trace: ${error.stack}`;
+	static showError(defaultMessage: string, error: Error) {
 
-		vscode.window.showErrorMessage(userMessage + message + stack);
-		
-		console.log(error.message);
-		console.log(error.stack);
+		ExtensionHelper.showNonCriticalError(defaultMessage, error);
+
+		if(error.message || error.stack) {
+			Configuration.get().getOutputChannel().show();
+		}
+	}
+
+	static showNonCriticalError(userMessage: string, error: Error) {
+
+		vscode.window.showErrorMessage(userMessage);
+
+		const outputChannel = Configuration.get().getOutputChannel();
+
+		if(error.message) {
+			const message = `Message: ${error.message}`;
+			outputChannel.appendLine(message);
+			console.log(error.message);
+		}
+
+		if(error.stack) {
+			const stack = `Stack Trace: ${error.stack}`;
+			outputChannel.appendLine(stack);
+			console.log(error.stack);
+		}
 	}
 }

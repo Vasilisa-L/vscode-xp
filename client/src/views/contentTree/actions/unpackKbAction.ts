@@ -76,13 +76,13 @@ export class UnpackKbAction {
 					"-o", outputDirPath
 				];
 
-				const output = await ProcessHelper.ExecuteWithArgsWithRealtimeOutput(
+				const status = await ProcessHelper.executeWithArgsWithRealtimeOutput(
 					knowledgeBasePackagerCli,
 					params,
 					this._config.getOutputChannel()
 				);
 
-				if(!output.includes(this.successSubstring)) {
+				if(!status.output.includes(this.successSubstring)) {
 
 					ExtensionHelper.showUserError(`Ошибка распаковки пакета. Смотри Output.`);
 					this._config.getOutputChannel().appendLine(knowledgeBasePackagerCli + " " + params.join(" "));

@@ -61,7 +61,7 @@ export class UnitTestsRunner {
 			const schemaFilePath = this._config.getSchemaFullPath(rootFolder);
 			const ruleFiltersDirPath = this._config.getRulesDirFilters();
 
-			const output = await ProcessHelper.ExecuteWithArgsWithRealtimeOutput(ecaTestParam,
+			const status = await ProcessHelper.executeWithArgsWithRealtimeOutput(ecaTestParam,
 				[
 					"--sdk", sdkDirPath,
 					"--taxonomy", taxonomyFilePath,
@@ -75,7 +75,7 @@ export class UnitTestsRunner {
 				this._config.getOutputChannel()
 			);
 
-			if(!output) {
+			if(!status) {
 				ExtensionHelper.showUserError("Ошибка запуска юнит-тестов, команда запуска не вернула ожидаемые данные. Проверьте пути до утилит.");
 				test.setStatus(TestStatus.Unknown);
 				return test;
@@ -85,11 +85,11 @@ export class UnitTestsRunner {
 			const ruleFileUri = vscode.Uri.file(ruleFilePath);
 
 			// Обновление статуса теста.
-			if(output.includes(this.SUCCESS_TEST_SUBSTRING)) {
+			if(status.output.includes(this.SUCCESS_TEST_SUBSTRING)) {
 				// Так как тест успешный, то можно сохранить отформатированный результат.
 				test.setStatus(TestStatus.Success);
 
-				const formatedOutput = TestHelper.formatTestCodeAndEvents(output);
+				const formatedOutput = TestHelper.formatTestCodeAndEvents(status.output);
 				test.setOutput(formatedOutput);
 
 				// Очищаем неформатированный вывод и добавляем отформатированный.
@@ -102,10 +102,10 @@ export class UnitTestsRunner {
 			}
 
 			test.setStatus(TestStatus.Failed);
-			test.setOutput(output);
+			test.setOutput(status.output);
 
 			// Парсим ошибки из вывода.
-			let diagnostics = this._outputParser.parse(output);
+			let diagnostics = this._outputParser.parse(status.output);
 
 			// Коррекция вывода.
 			const ruleContent = await FileSystemHelper.readContentFile(ruleFilePath);

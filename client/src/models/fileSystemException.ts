@@ -1,6 +1,6 @@
 import { XpException } from './xpException';
 
-export class FileNotFoundException extends XpException {
+export class FileSystemException extends XpException {
 	public constructor(message: string, path?: string, inner?: Error) {
 		super(message, inner);
 		this._path = path;

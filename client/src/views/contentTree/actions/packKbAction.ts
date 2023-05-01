@@ -91,7 +91,7 @@ export class PackSIEMAllPackagesAction {
 				 * kbtools.exe pack -s "c:\src\path" -o "c:\dst\path\packages.kb
 				 */
 				emitter.fire(`\n\nXP:: Промежуточный статус: Запущена команда архивации файлов, это может занимать длительное время!\n\n`);
-				const output = await ProcessHelper.ExecuteWithArgsWithRealtimeEmmiterOutput(
+				const output = await ProcessHelper.executeWithArgsWithRealtimeEmmiterOutput(
 					knowledgeBasePackagerCli,
 					[
 						"pack", 
@@ -173,7 +173,7 @@ export class PackKbAction {
 
 				// Типовая команда выглядит так:
 				// kbtools(kbpack).exe pack -s "c:\tmp\pack" -o "c:\tmp\pack\Esc.kb"
-				const output = await ProcessHelper.ExecuteWithArgsWithRealtimeOutput(
+				const status = await ProcessHelper.executeWithArgsWithRealtimeOutput(
 					knowledgeBasePackagerCli,
 					[
 						"pack", 
@@ -183,7 +183,7 @@ export class PackKbAction {
 					this._config.getOutputChannel()
 				);
 
-				if(output.includes(this.successSubstring)) {
+				if(status.output.includes(this.successSubstring)) {
 					ExtensionHelper.showUserInfo(`Пакет '${packageName}' успешно собран.`);
 					return;
 				} 
